@@ -2,6 +2,23 @@
 SnapPass
 ========
 
+
+About this fork
+---------------
+
+The goal of this fork is to create an entreprise solution without sharing the solution to everybody. In this contexte if you want external people to share a secret with internal ones, there is a feature to share a temporary link to allow this.
+
+The goal is to protect the solution using WAF and reverse proxy and expose only the secrets and the temporary links.
+
+I also add the possibility to set a base path to make https://example.com/snappass/ possible.   
+
+I updated the version of jquery with the latest version and the same for bootstrap.
+
+I add an option to chose the IP address where the service binds, 127.0.0.1 is a better option than 0.0.0.0 in a non-docker context.
+
+I changed the way to encode the encryption key in order to avoid the missing '=' at the end of the link when you share the link with your email application.
+
+
 |pypi| |build|
 
 .. |pypi| image:: https://img.shields.io/pypi/v/snappass.svg
