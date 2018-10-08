@@ -1,23 +1,24 @@
-FROM python:3.6
+FROM python:3.7-slim
 
-ENV APP_DIR=/usr/src/snappass
+# Set the working directory to /app
+WORKDIR /app
 
-RUN groupadd -r snappass && \
+# Copy the snappass contents into the container at /app
+COPY ./snappass /app
+COPY requirements.txt /tmp
+
+RUN pip install --trusted-host pypi.python.org -r /tmp/requirements.txt && \
+	groupadd -r snappass && \
     useradd -r -g snappass snappass && \
-    mkdir -p $APP_DIR
-
-WORKDIR $APP_DIR
-
-COPY ["setup.py", "MANIFEST.in", "README.rst", "AUTHORS.rst", "$APP_DIR/"]
-COPY ["./snappass", "$APP_DIR/snappass"]
-
-RUN python setup.py install && \
-    chown -R snappass $APP_DIR && \
-    chgrp -R snappass $APP_DIR
+    chown -R snappass /app && \
+    chgrp -R snappass /app
 
 USER snappass
 
 # Default Flask port
 EXPOSE 5000
 
-CMD ["snappass"]
+# Define environment variable
+ENV NAME SnapPass
+
+CMD ["python", "main.py"]
