@@ -28,7 +28,6 @@ base_path = ""
 if os.environ.get('BASE_PATH'):
     base_path=os.environ.get('BASE_PATH')
 
-listen_ip
 if os.environ.get('LISTEN_IP'):
     listen_ip=os.environ.get('LISTEN_IP','127.0.0.1')
 
