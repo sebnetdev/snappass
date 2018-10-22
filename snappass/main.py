@@ -24,18 +24,18 @@ app = Flask(__name__)
 if os.environ.get('DEBUG'):
     app.debug = True
 app.secret_key = os.environ.get('SECRET_KEY', 'Secret Key')
-base_path = ""
-if os.environ.get('BASE_PATH'):
-    base_path=os.environ.get('BASE_PATH')
 
-if os.environ.get('LISTEN_IP'):
-    listen_ip=os.environ.get('LISTEN_IP','127.0.0.1')
-
+base_path = base_path=os.environ.get('BASE_PATH',"")
+listen_ip=os.environ.get('LISTEN_IP','127.0.0.1')
+title=os.environ.get('TITLE','Share Password')
+company_name=os.environ.get('COMPANY_NAME','Snappass')
+company_logo_url=os.environ.get('COMPANY_LOGO_URL','')
 
 app.config.update(dict(BASE_PATH=base_path))
-
-app.config.update(
-    dict(STATIC_URL=os.environ.get('STATIC_URL', '/static')))
+app.config.update(dict(TITLE=title))
+app.config.update(dict(COMPANY_NAME=company_name))
+app.config.update(dict(COMPANY_LOGO_URL=company_logo_url))
+app.config.update(dict(STATIC_URL=os.environ.get('STATIC_URL', '/static')))
 
 # Initialize Redis
 if os.environ.get('MOCK_REDIS'):
@@ -52,7 +52,7 @@ else:
 REDIS_PREFIX = os.environ.get('REDIS_PREFIX', 'snappass')
 
 #TIME_CONVERSION = {'week': 604800, 'day': 86400, 'hour': 3600}
-TIME_CONVERSION = {'5min': 300, '10min': 600, '30min': 1800, '60min' : 3600}
+TIME_CONVERSION = {'1hour': 3600, '2hours': 7200, '4hours': 14400, '8hours' : 28800}
 
 
 def check_redis_alive(fn):
@@ -198,7 +198,7 @@ def request_is_valid(request):
 
 @app.route('/'+base_path, methods=['GET'])
 def index():
-    return render_template('set_password.html')
+    return render_template('set_password.html', shareme="yes")
 
 
 @app.route('/'+base_path+"sharepass/"+'<storage_key>', methods=['GET'])
@@ -207,14 +207,15 @@ def index_share(storage_key):
         abort(404)
 
     if check_shared_url(storage_key):
-        return render_template('set_password.html')
+        return render_template('set_password.html', shareme="no")
     
-    abort(404)
+    return render_template('nokey.html')
+    #abort(404)
 
 
-@app.route('/'+base_path+"shareme/", methods=['GET'])
-def share_url():
-    return render_template('share_url.html')
+# @app.route('/'+base_path+"shareme/", methods=['GET'])
+# def share_url():
+#     return render_template('share_url.html')
 
 
 @app.route('/'+base_path+"shareme/", methods=['POST'])
@@ -260,7 +261,8 @@ def show_password(password_key):
         abort(404)
     password = get_password(password_key)
     if not password:
-        abort(404)
+        #abort(404)
+        return render_template('nokey.html')
 
     return render_template('password.html', password=password)
 
