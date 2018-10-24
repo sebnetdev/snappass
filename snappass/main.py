@@ -46,9 +46,14 @@ elif os.environ.get('REDIS_URL'):
 else:
     redis_host = os.environ.get('REDIS_HOST', 'localhost')
     redis_port = os.environ.get('REDIS_PORT', 6379)
+    redis_password = os.environ.get('REDIS_PASSWORD', None)
     redis_db = os.environ.get('SNAPPASS_REDIS_DB', 0)
-    redis_client = redis.StrictRedis(
-        host=redis_host, port=redis_port, db=redis_db)
+
+    if redis_password:
+        redis_client = redis.StrictRedis(host=redis_host, port=redis_port, db=redis_db)
+    else:
+        redis_client = redis.StrictRedis(host=redis_host, port=redis_port, db=redis_db, password=redis_password)
+
 REDIS_PREFIX = os.environ.get('REDIS_PREFIX', 'snappass')
 
 #TIME_CONVERSION = {'week': 604800, 'day': 86400, 'hour': 3600}
