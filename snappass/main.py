@@ -6,7 +6,7 @@ import uuid
 import redis
 
 from cryptography.fernet import Fernet
-from flask import abort, Flask, render_template, request
+from flask import abort, Flask, render_template, request, json, Response
 from redis.exceptions import ConnectionError
 from werkzeug.urls import url_quote_plus
 from werkzeug.urls import url_unquote_plus
@@ -49,15 +49,12 @@ else:
     redis_password = os.environ.get('REDIS_PASSWORD', None)
     redis_db = os.environ.get('SNAPPASS_REDIS_DB', 0)
 
-    if redis_password:
-        redis_client = redis.StrictRedis(host=redis_host, port=redis_port, db=redis_db)
-    else:
-        redis_client = redis.StrictRedis(host=redis_host, port=redis_port, db=redis_db, password=redis_password)
+    redis_client = redis.StrictRedis(host=redis_host, port=redis_port, db=redis_db, password=redis_password)
 
 REDIS_PREFIX = os.environ.get('REDIS_PREFIX', 'snappass')
 
 #TIME_CONVERSION = {'week': 604800, 'day': 86400, 'hour': 3600}
-TIME_CONVERSION = {'1hour': 3600, '2hours': 7200, '4hours': 14400, '8hours' : 28800}
+TIME_CONVERSION = {'1hour': 3600, '2hours': 7200, '4hours': 14400, '8hours' : 28800, "1day": 86400}
 
 
 def check_redis_alive(fn):
@@ -247,6 +244,47 @@ def handle_password():
 def handle_password_share(id):
     return store_password()
 
+@app.route('/'+base_path+"api/setpassword", methods=['POST'])
+def handle_password_api():
+    json_data = request.get_json(force=True)
+    ttl = TIME_CONVERSION[json_data["ttl"].lower()]
+    password = json_data["password"]
+    result_type = json_data["result_type"].lower()
+    token = set_password(password, ttl)
+
+    if NO_SSL:
+        base_url = request.url_root
+    else:
+        base_url = request.url_root.replace("http://", "https://")
+    link = base_url + base_path + 'key/' + token
+
+    response_json = json.dumps({"status":"success","token":token,"link":link})
+    if result_type == "json":
+        return Response(response_json,status=200,mimetype="Application/json")
+    else:
+        return Response(link,status=200,mimetype="text/plain")
+
+
+@app.route('/'+base_path+"api/getpassword/<result_type>/<password_key>", methods=['GET'])
+def show_password_api(result_type,password_key):
+    if not request_is_valid(request):
+        if result_type == "json":
+            return Response('{"status":"error","message":"invalid request"}',status=400,mimetype="Application/json")
+        else:
+            return Response("invalid request",status=400,mimetype="text/plain")
+    password = get_password(password_key)
+    if not password:
+        if result_type == "json":
+            return Response('{"status":"error","message":"key not found"}',status=404,mimetype="Application/json")
+        else:
+            return Response("key not found",status=404,mimetype="text/plain")
+
+    if result_type == "json":
+        return Response('{"status":"success","password":"%s"}' % password,status=200,mimetype="Application/json")
+    else:
+        return Response(password,status=200,mimetype="text/plain")
+
+
 def store_password():
     ttl, password = clean_input()
     token = set_password(password, ttl)
@@ -256,8 +294,8 @@ def store_password():
     else:
         base_url = request.url_root.replace("http://", "https://")
     link = base_url + base_path + 'key/' + token
-    return render_template('confirm.html', password_link=link)
 
+    return render_template('confirm.html', password_link=link)
 
 
 @app.route('/'+base_path+'key/'+'<password_key>', methods=['GET'])
