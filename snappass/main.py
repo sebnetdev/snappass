@@ -36,6 +36,7 @@ app.config.update(dict(TITLE=title))
 app.config.update(dict(COMPANY_NAME=company_name))
 app.config.update(dict(COMPANY_LOGO_URL=company_logo_url))
 app.config.update(dict(STATIC_URL=os.environ.get('STATIC_URL', '/static')))
+app.config.update(dict(HELP_URL=os.environ.get('HELP_URL', '')))
 
 # Initialize Redis
 if os.environ.get('MOCK_REDIS'):
