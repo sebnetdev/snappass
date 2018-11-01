@@ -10,7 +10,7 @@ The goal of this fork is to create an entreprise solution without sharing the so
 
 Here is an example of a possible architecture:
 
-[[https://github.com/sebnetdev/snappass/blob/master/img/snappass-archi.png|alt=snappass-archi]]
+![Snappass Architecture](https://raw.githubusercontent.com/sebnetdev/snappass/master/img/snappass.png)
 
 The goal is to protect the solution using WAF and reverse proxy and expose only the secrets and the temporary links.
 
