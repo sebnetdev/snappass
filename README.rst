@@ -8,15 +8,28 @@ About this fork
 
 The goal of this fork is to create an entreprise solution without sharing the solution to everybody. In this contexte if you want external people to share a secret with internal ones, there is a feature to share a temporary link to allow this.
 
+Here is an example of a possible architecture:
+
+[[https://github.com/sebnetdev/snappass/blob/master/img/snappass-archi.png|alt=snappass-archi]]
+
 The goal is to protect the solution using WAF and reverse proxy and expose only the secrets and the temporary links.
 
 I also add the possibility to set a base path to make https://example.com/snappass/ possible.   
 
-I updated the version of jquery with the latest version and the same for bootstrap.
+I updated the version of jquery with the latest version and the same for bootstrap and font awsome.
 
 I add an option to chose the IP address where the service binds, 127.0.0.1 is a better option than 0.0.0.0 in a non-docker context.
 
 I changed the way to encode the encryption key in order to avoid the missing '=' at the end of the link when you share the link with your email application.
+
+There are a couple of options for:
+  - Title
+  - Company name
+  - Company logo URL
+  - Help URL
+  - Liste of TTL
+  - Listen IP address
+
 
 
 |pypi| |build|

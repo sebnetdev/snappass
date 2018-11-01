@@ -25,16 +25,14 @@ if os.environ.get('DEBUG'):
     app.debug = True
 app.secret_key = os.environ.get('SECRET_KEY', 'Secret Key')
 
-base_path = base_path=os.environ.get('BASE_PATH',"")
+base_path = os.environ.get('BASE_PATH',"")
 listen_ip=os.environ.get('LISTEN_IP','127.0.0.1')
-title=os.environ.get('TITLE','Share Password')
-company_name=os.environ.get('COMPANY_NAME','Snappass')
-company_logo_url=os.environ.get('COMPANY_LOGO_URL','')
+time_list_json=os.environ.get('TIME_LIST','[{"id":"4hours","label":"4 hours","ttl":14400},{"id":"1hour","label":"1 hour","ttl":3600},{"id":"2hours","label":"2 hours","ttl":7200},{"id":"8hours","label": "8 hours","ttl":28800},{"id":"1day","label":"1 day","ttl":86400}]')
 
 app.config.update(dict(BASE_PATH=base_path))
-app.config.update(dict(TITLE=title))
-app.config.update(dict(COMPANY_NAME=company_name))
-app.config.update(dict(COMPANY_LOGO_URL=company_logo_url))
+app.config.update(dict(TITLE=os.environ.get('TITLE','Share Password')))
+app.config.update(dict(COMPANY_NAME=os.environ.get('COMPANY_NAME','Snappass')))
+app.config.update(dict(COMPANY_LOGO_URL=os.environ.get('COMPANY_LOGO_URL','')))
 app.config.update(dict(STATIC_URL=os.environ.get('STATIC_URL', '/static')))
 app.config.update(dict(HELP_URL=os.environ.get('HELP_URL', '')))
 
@@ -55,7 +53,25 @@ else:
 REDIS_PREFIX = os.environ.get('REDIS_PREFIX', 'snappass')
 
 #TIME_CONVERSION = {'week': 604800, 'day': 86400, 'hour': 3600}
-TIME_CONVERSION = {'1hour': 3600, '2hours': 7200, '4hours': 14400, '8hours' : 28800, "1day": 86400}
+
+
+time_list = json.loads(time_list_json)
+
+# [ 
+# { 'id' : '4hours', 'label': '4 hours', 'ttl':14400},
+# { 'id' : '1hour', 'label': '1 hour', 'ttl':3600},
+# { 'id' : '2hours', 'label': '2 hours', 'ttl':7200},
+# { 'id' : '8hours', 'label': '8 hours', 'ttl':28800},
+# { 'id' : '1day', 'label': '1day', 'ttl':86400}
+# ]
+
+
+#TIME_CONVERSION = {'1hour': 3600, '2hours': 7200, '4hours': 14400, '8hours' : 28800, "1day": 86400}
+
+TIME_CONVERSION={}
+
+for time_info in time_list:
+    TIME_CONVERSION[time_info['id']]=time_info['ttl']
 
 
 def check_redis_alive(fn):
@@ -201,7 +217,7 @@ def request_is_valid(request):
 
 @app.route('/'+base_path, methods=['GET'])
 def index():
-    return render_template('set_password.html', shareme="yes")
+    return render_template('set_password.html', shareme="yes", time_list=time_list)
 
 
 @app.route('/'+base_path+"sharepass/"+'<storage_key>', methods=['GET'])
@@ -210,7 +226,7 @@ def index_share(storage_key):
         abort(404)
 
     if check_shared_url(storage_key):
-        return render_template('set_password.html', shareme="no")
+        return render_template('set_password.html', shareme="no",time_list=time_list)
     
     return render_template('nokey.html')
     #abort(404)
