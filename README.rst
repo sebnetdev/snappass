@@ -17,22 +17,22 @@ Here is an example of a possible architecture:
 
 The goal is to protect the solution using WAF and reverse proxy and expose only the secrets and the temporary links.
 
-I also add the possibility to set a base path to make https://example.com/snappass/ possible.   
+What I added/modified:
 
-I updated the version of jquery with the latest version and the same for bootstrap and font awsome.
+  - the possibility to set a base path to make https://example.com/snappass/ possible.   
+  - the version of jquery with the latest version and the same for bootstrap and font awsome have been updated.
+  - an option to chose the IP address where the service binds, 127.0.0.1 is a better option than 0.0.0.0 in a non-docker context.
+  - an API to set a a password from another application
+  - the way to encode the encryption key in order to avoid the missing '=' at the end of the link when you share the link with your email application.
 
-I add an option to chose the IP address where the service binds, 127.0.0.1 is a better option than 0.0.0.0 in a non-docker context.
-
-I changed the way to encode the encryption key in order to avoid the missing '=' at the end of the link when you share the link with your email application.
 
 There are a couple of options for:
   - Title
   - Company name
   - Company logo URL
   - Help URL
-  - Liste of TTL
+  - List of TTL
   - Listen IP address
-
 
 
 |pypi| |build|
