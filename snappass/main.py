@@ -173,11 +173,13 @@ def set_shared_url(ttl):
 
 
 @check_redis_alive
-def check_shared_url(storage_key):
+def check_shared_url(storage_key,remove=False):
     """
     """
     password = redis_client.get(storage_key)
-    redis_client.delete(storage_key)
+
+    if remove:
+        redis_client.delete(storage_key)
 
     if password is not None:
         return True
@@ -189,19 +191,27 @@ def empty(value):
         return True
 
 
+
+@app.errorhandler(400)
+def bad_request_page(e):
+    return render_template('error.html',error_message="You enter an invalid value like an empty password!"), 400
+
 def clean_input():
     """
     Make sure we're not getting bad data from the front end,
     format data to be machine readable
     """
     if empty(request.form.get('password', '')):
+        render_template('error.html',error_message="Password does not have to be empty !")
         abort(400)
 
     if empty(request.form.get('ttl', '')):
+        render_template('error.html',error_message="Surprising! Why the TTL is empty?")
         abort(400)
 
     time_period = request.form['ttl'].lower()
     if time_period not in TIME_CONVERSION:
+        render_template('error.html',error_message="Surprising! This TTL does not exit !")
         abort(400)
 
     return TIME_CONVERSION[time_period], request.form['password']
@@ -225,7 +235,7 @@ def index_share(storage_key):
     if not request_is_valid(request):
         abort(404)
 
-    if check_shared_url(storage_key):
+    if check_shared_url(storage_key,False):
         return render_template('set_password.html', shareme="no",time_list=time_list)
     
     return render_template('nokey.html')
@@ -259,7 +269,11 @@ def handle_password():
 
 @app.route('/'+base_path+"sharepass/<id>", methods=['POST'])
 def handle_password_share(id):
-    return store_password()
+
+    if check_shared_url(id,True):
+        return store_password()
+
+    return render_template('nokey.html')
 
 @app.route('/'+base_path+"api/setpassword", methods=['POST'])
 def handle_password_api():

@@ -4,7 +4,7 @@
 <div class="container">
   <section>
     <div class="page-header"><h1>Share Secret Link</h1></div>
-    <p>The secret has been temporarily saved. Send the following URL to your intended recipient.</p>
+    <p>The secret has been temporarily saved. Send the following URL to your intended recipient. Do not use the link in your web browser, just share it, it is a "one time click link" !</p>
     <div class="row">
       <div class="col-sm-6 margin-bottom-10">
         <input type="text" class="form-control" id="password-link" value="{{ password_link }}" readonly="readonly">
@@ -16,6 +16,9 @@
               data-placement='bottom'>
           <i class="fa fa-clipboard"></i>
         </button>
+      </div>
+      <div class="col-sm-6">
+          <a href="mailto:?subject=Here is the password&body=This is the password: {{ password_link }}" class="button">Send it by email</a>
       </div>
     </div>
   </section>
