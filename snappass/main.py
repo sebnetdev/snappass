@@ -28,6 +28,8 @@ app.secret_key = os.environ.get('SECRET_KEY', 'Secret Key')
 base_path = os.environ.get('BASE_PATH',"")
 listen_ip=os.environ.get('LISTEN_IP','127.0.0.1')
 time_list_json=os.environ.get('TIME_LIST','[{"id":"4hours","label":"4 hours","ttl":14400},{"id":"1hour","label":"1 hour","ttl":3600},{"id":"2hours","label":"2 hours","ttl":7200},{"id":"8hours","label": "8 hours","ttl":28800},{"id":"1day","label":"1 day","ttl":86400}]')
+api_time_list_json=os.environ.get('API_TIME_LIST','[{"id":"1day","label":"1 day","ttl":86400},{"id":"2days","label":"2 days","ttl":86400*2},{"id":"4days","label":"4 days","ttl":86400*4},{"id":"8days","label":"8 days","ttl":86400*8}]')
+
 
 app.config.update(dict(BASE_PATH=base_path))
 app.config.update(dict(TITLE=os.environ.get('TITLE','Share Password')))
@@ -56,6 +58,7 @@ REDIS_PREFIX = os.environ.get('REDIS_PREFIX', 'snappass')
 
 
 time_list = json.loads(time_list_json)
+api_time_list = json.loads(time_list_json)
 
 # [ 
 # { 'id' : '4hours', 'label': '4 hours', 'ttl':14400},
@@ -72,6 +75,12 @@ TIME_CONVERSION={}
 
 for time_info in time_list:
     TIME_CONVERSION[time_info['id']]=time_info['ttl']
+
+
+API_TIME_CONVERSION={}
+
+for time_info in api_time_list:
+    API_TIME_CONVERSION[time_info['id']]=time_info['ttl']
 
 
 def check_redis_alive(fn):
@@ -278,7 +287,7 @@ def handle_password_share(id):
 @app.route('/'+base_path+"api/setpassword", methods=['POST'])
 def handle_password_api():
     json_data = request.get_json(force=True)
-    ttl = TIME_CONVERSION[json_data["ttl"].lower()]
+    ttl = API_TIME_CONVERSION[json_data["ttl"].lower()]
     password = json_data["password"]
     result_type = json_data["result_type"].lower()
     token = set_password(password, ttl)
