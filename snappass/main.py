@@ -28,7 +28,7 @@ app.secret_key = os.environ.get('SECRET_KEY', 'Secret Key')
 base_path = os.environ.get('BASE_PATH',"")
 listen_ip=os.environ.get('LISTEN_IP','127.0.0.1')
 time_list_json=os.environ.get('TIME_LIST','[{"id":"4hours","label":"4 hours","ttl":14400},{"id":"1hour","label":"1 hour","ttl":3600},{"id":"2hours","label":"2 hours","ttl":7200},{"id":"8hours","label": "8 hours","ttl":28800},{"id":"1day","label":"1 day","ttl":86400}]')
-api_time_list_json=os.environ.get('API_TIME_LIST','[{"id":"1day","label":"1 day","ttl":86400},{"id":"2days","label":"2 days","ttl":86400*2},{"id":"4days","label":"4 days","ttl":86400*4},{"id":"8days","label":"8 days","ttl":86400*8}]')
+api_time_list_json=os.environ.get('API_TIME_LIST','[{"id":"1day","label":"1 day","ttl":86400},{"id":"2days","label":"2 days","ttl":172800},{"id":"4days","label":"4 days","ttl":345600},{"id":"8days","label":"8 days","ttl":691200}]')
 
 
 app.config.update(dict(BASE_PATH=base_path))
