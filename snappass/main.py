@@ -58,7 +58,7 @@ REDIS_PREFIX = os.environ.get('REDIS_PREFIX', 'snappass')
 
 
 time_list = json.loads(time_list_json)
-api_time_list = json.loads(time_list_json)
+api_time_list = json.loads(api_time_list_json)
 
 # [ 
 # { 'id' : '4hours', 'label': '4 hours', 'ttl':14400},
